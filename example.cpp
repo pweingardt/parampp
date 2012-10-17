@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
             << parampp::Parameter("o", "out", parampp::REQUIRED, parampp::SINGLE_ARG, "the output file");
         p.parse(argc, argv);
-    } catch(parampp::ParameterException e) {
+    } catch(parampp::ParserException e) {
         std::cout << e.what() << std::endl;
         p.printUsage();
         return 1;
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 
     try {
         p.checkRequired();
-    } catch(parampp::ParameterException e) {
+    } catch(parampp::ParserException e) {
         std::cout << e.what() << std::endl;
         p.printUsage();
         return 1;

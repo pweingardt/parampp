@@ -201,25 +201,20 @@ class Parser {
 /**
  * @brief A parameter exception, which is thrown by Parser.
  */
-class ParameterException : public std::exception {
+class ParserException : public std::exception {
     private:
         /**
          * @brief the exception message
          */
         std::string message;
 
-        /**
-         * @brief the long form of the parameter
-         */
-        std::string parameter;
-
     public:
         /**
          * @brief Default constructor
          */
-        ParameterException(const std::string& message, const std::string& longForm);
+        ParserException(const std::string& message, const std::string& longForm);
 
-        virtual ~ParameterException(void) throw();
+        virtual ~ParserException(void) throw();
 
         /**
          * @brief returns the exception message

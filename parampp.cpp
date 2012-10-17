@@ -29,7 +29,7 @@ namespace parampp {
 
 Parser& Parser::operator<<(const Parameter& o) {
     if(o.longForm == "") {
-        throw ParameterException("Empty long form parameter not allowed: ", o.shortForm);
+        throw ParserException("Empty long form parameter not allowed: ", o.shortForm);
     }
 
     if(this->parameters.find(o.longForm) == this->parameters.end() &&
@@ -38,7 +38,7 @@ Parser& Parser::operator<<(const Parameter& o) {
         this->parameters[o.longForm] = o;
         this->sparameters[o.shortForm] = o;
     } else {
-        throw ParameterException("Parameter already defined: ", o.longForm);
+        throw ParserException("Parameter already defined: ", o.longForm);
     }
 
     return *this;
@@ -100,7 +100,7 @@ int Parser::parse(int argc, char** argv) {
                 }
 
                 if(this->parameters.find(pname) == this->parameters.end()) {
-                    throw ParameterException("Unknown parameter: ", pname);
+                    throw ParserException("Unknown parameter: ", pname);
                 }
 
                 const Parameter& op = this->parameters[pname];
@@ -121,7 +121,7 @@ int Parser::parse(int argc, char** argv) {
                     std::string pname(p.substr(p.find_first_not_of("-")));
 
                     if(this->sparameters.find(pname) == this->sparameters.end()) {
-                        throw ParameterException("Unknown parameter: ", pname);
+                        throw ParserException("Unknown parameter: ", pname);
                     }
 
                     const Parameter& o = this->sparameters[pname];
@@ -139,7 +139,7 @@ int Parser::parse(int argc, char** argv) {
 
         if(parsed == false) {
             if(current == 0) {
-                throw ParameterException("Argument parsing error: ", p);
+                throw ParserException("Argument parsing error: ", p);
             }
 
             addValue(*current, p);
@@ -151,7 +151,7 @@ int Parser::parse(int argc, char** argv) {
     }
 
     if(current != 0 && current->args != MULTI_ARGS) {
-        throw ParameterException("Parameter not specified: ", current->longForm);
+        throw ParserException("Parameter not specified: ", current->longForm);
     }
 
     // add default values if necessary
@@ -170,27 +170,27 @@ void Parser::checkRequired() {
     // Check if all required parameters are available
     for(auto iter = this->parameters.begin(); iter != this->parameters.end(); ++iter) {
         if(iter->second.type == REQUIRED && this->values.find(iter->first) == this->values.end()) {
-            throw ParameterException("Required parameter not specified: ", iter->first);
+            throw ParserException("Required parameter not specified: ", iter->first);
         }
     }
 }
 
 void Parser::addValue(const Parameter& o, const std::string& value) {
     if(value == "") {
-        throw ParameterException("Parameter format exception: ", o.longForm);
+        throw ParserException("Parameter format exception: ", o.longForm);
     }
 
     switch(o.args) {
         case NO_ARGS:
             if(value != "1" && value != "0") {
-                throw ParameterException("Parameter flags are either '0' or '1': ", o.longForm);
+                throw ParserException("Parameter flags are either '0' or '1': ", o.longForm);
             }
             this->values[o.longForm] = value;
             break;
 
         case SINGLE_ARG:
             if(this->values.find(o.longForm) != this->values.end()) {
-                throw ParameterException("Parameter already defined: ", o.longForm);
+                throw ParserException("Parameter already defined: ", o.longForm);
             }
             this->values[o.longForm] = value;
             break;
@@ -220,17 +220,16 @@ std::vector<std::string> Parser::getAll(const std::string& name) {
     return this->multiple[name];
 }
 
-ParameterException::ParameterException(const std::string& message,
+ParserException::ParserException(const std::string& message,
         const std::string& parameter) {
-    this->message = message;
-    this->parameter = parameter;
+    this->message = std::string(message + parameter);
 }
 
-ParameterException::~ParameterException(void) throw() {
+ParserException::~ParserException(void) throw() {
 }
 
-const char* ParameterException::what(void) {
-    return std::string(this->message + this->parameter).c_str();
+const char* ParserException::what(void) {
+    return this->message.c_str();
 }
 
 }
