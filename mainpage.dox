@@ -1,0 +1,17 @@
+/**
+ * @file parampp.h
+ * @brief Small C++ parameter library
+ * @mainpage
+
+This is a small C++ library, used to parse parameters.
+
+For example:
+you have a program, that accepts multiple parameters, say multiple optional input files,
+a required output file and an optional help flag (see example.cpp for the code).
+<p>
+You can use parampp to define your parameters and let the parser parse the parameters,
+so that you can access them in a nice way.
+
+ */
+
+

@@ -19,44 +19,50 @@
 #include "parampp.h"
 #include <iostream>
 
+/**
+ * @file parampp.cpp
+ * @author Paul W.
+ * @brief the Parser implementation
+ */
+
 namespace parampp {
 
-Parameters& Parameters::operator<<(const Option& o) {
+Parser& Parser::operator<<(const Parameter& o) {
     if(o.longForm == "") {
         throw ParameterException("Empty long form parameter not allowed: ", o.shortForm);
     }
 
-    if(this->options.find(o.longForm) == this->options.end() &&
-            (this->soptions.find(o.shortForm) == this->soptions.end()
+    if(this->parameters.find(o.longForm) == this->parameters.end() &&
+            (this->sparameters.find(o.shortForm) == this->sparameters.end()
              || o.shortForm == "")) {
-        this->options[o.longForm] = o;
-        this->soptions[o.shortForm] = o;
+        this->parameters[o.longForm] = o;
+        this->sparameters[o.shortForm] = o;
     } else {
-        throw ParameterException("Option already defined: ", o.longForm);
+        throw ParameterException("Parameter already defined: ", o.longForm);
     }
 
     return *this;
 }
 
-void Parameters::printUsage(void) {
+void Parser::printUsage(void) {
     unsigned int longest = 0;
 
-    std::cout << "Parameters: '-x value', '--xy=value', "
+    std::cout << "Parser: '-x value', '--xy=value', "
         "'-x 1st_arg 2nd_arg ...', " << std::endl << "    '--xy=1st_arg --xy=2nd_arg', "
         "or '-x 1st_arg (...) -x 2nd_arg'" << std::endl;
     std::cout << "Flags: '-h' or '--help=(0|1)'." << std::endl;
 
-    for(auto iter = this->options.begin(); iter != this->options.end(); ++iter) {
-        const Option& o = iter->second;
+    for(auto iter = this->parameters.begin(); iter != this->parameters.end(); ++iter) {
+        const Parameter& o = iter->second;
         if(longest < o.longForm.length() + o.shortForm.length()) {
             longest = o.longForm.length() + o.shortForm.length();
         }
     }
 
-    for(auto iter = this->options.begin(); iter != this->options.end(); ++iter) {
+    for(auto iter = this->parameters.begin(); iter != this->parameters.end(); ++iter) {
         unsigned int width = 8;
 
-        const Option& o = iter->second;
+        const Parameter& o = iter->second;
         if(o.shortForm != "") {
             std::cout << "-" << o.shortForm << ", ";
         } else {
@@ -76,8 +82,8 @@ void Parameters::printUsage(void) {
     }
 }
 
-int Parameters::parse(int argc, char** argv) {
-    Option* current = 0;
+int Parser::parse(int argc, char** argv) {
+    Parameter* current = 0;
     for(int i = 1; i < argc; ++i) {
         std::string p(argv[i]);
         bool parsed = false;
@@ -93,11 +99,11 @@ int Parameters::parse(int argc, char** argv) {
                     pname = param.substr(0, param.find_first_of("="));
                 }
 
-                if(this->options.find(pname) == this->options.end()) {
+                if(this->parameters.find(pname) == this->parameters.end()) {
                     throw ParameterException("Unknown parameter: ", pname);
                 }
 
-                const Option& op = this->options[pname];
+                const Parameter& op = this->parameters[pname];
                 std::string value;
 
                 if(param.find("=") == std::string::npos) {
@@ -114,16 +120,16 @@ int Parameters::parse(int argc, char** argv) {
                 if(p[0] == '-') {
                     std::string pname(p.substr(p.find_first_not_of("-")));
 
-                    if(this->soptions.find(pname) == this->soptions.end()) {
+                    if(this->sparameters.find(pname) == this->sparameters.end()) {
                         throw ParameterException("Unknown parameter: ", pname);
                     }
 
-                    const Option& o = this->soptions[pname];
+                    const Parameter& o = this->sparameters[pname];
 
                     if(o.args == NO_ARGS) {
                         this->values[o.longForm] = "1";
                     } else {
-                        current = &this->soptions[pname];
+                        current = &this->sparameters[pname];
                     }
 
                     parsed = true;
@@ -149,7 +155,7 @@ int Parameters::parse(int argc, char** argv) {
     }
 
     // add default values if necessary
-    for(auto iter = this->options.begin(); iter != this->options.end(); ++iter) {
+    for(auto iter = this->parameters.begin(); iter != this->parameters.end(); ++iter) {
         if(iter->second.def != "") {
             if(this->values.find(iter->first) == this->values.end()) {
                 addValue(iter->second, iter->second.def);
@@ -160,16 +166,16 @@ int Parameters::parse(int argc, char** argv) {
     return 0;
 }
 
-void Parameters::checkRequired() {
+void Parser::checkRequired() {
     // Check if all required parameters are available
-    for(auto iter = this->options.begin(); iter != this->options.end(); ++iter) {
+    for(auto iter = this->parameters.begin(); iter != this->parameters.end(); ++iter) {
         if(iter->second.type == REQUIRED && this->values.find(iter->first) == this->values.end()) {
             throw ParameterException("Required parameter not specified: ", iter->first);
         }
     }
 }
 
-void Parameters::addValue(const Option& o, const std::string& value) {
+void Parser::addValue(const Parameter& o, const std::string& value) {
     if(value == "") {
         throw ParameterException("Parameter format exception: ", o.longForm);
     }
@@ -196,21 +202,21 @@ void Parameters::addValue(const Option& o, const std::string& value) {
     }
 }
 
-std::string Parameters::get(const std::string& name) {
+std::string Parser::get(const std::string& name) {
     return this->values[name];
 }
 
-bool Parameters::getFlag(const std::string& name) {
+bool Parser::getFlag(const std::string& name) {
     int v = this->getInt(name);
     return (v == 0 ? false : true);
 }
 
-int Parameters::getInt(const std::string& name) {
+int Parser::getInt(const std::string& name) {
     int v = atoi(this->values[name].c_str());
     return v;
 }
 
-std::vector<std::string> Parameters::getAll(const std::string& name) {
+std::vector<std::string> Parser::getAll(const std::string& name) {
     return this->multiple[name];
 }
 

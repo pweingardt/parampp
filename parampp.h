@@ -23,24 +23,62 @@
 #include <string>
 #include <exception>
 
+
 namespace parampp {
 
+/**
+ * @brief Parameter type
+ */
 typedef enum {REQUIRED, OPTIONAL} ParamType;
+
+/**
+ * @brief Parameter arguments type
+ */
 typedef enum {NO_ARGS, SINGLE_ARG, MULTI_ARGS} ParamArgs;
 
-struct Option {
+/**
+ * @brief A single parameter
+ */
+struct Parameter {
+    /**
+     * @brief the long form (e.g. "file")
+     */
     std::string longForm;
+
+    /**
+     * @brief the short form (e.g. "f")
+     */
+    std::string shortForm;
+
+    /**
+     * @brief the type of the parameter (optional, required)
+     */
     ParamType type;
+
+    /**
+     * @brief the type of arguments (none, one, multiple)
+     */
     ParamArgs args;
 
-    std::string shortForm;
+    /**
+     * @brief the default value
+     */
     std::string def;
 
+    /**
+     * @brief the description
+     */
     std::string description;
 
-    Option() { };
+    /**
+     * @brief Default empty constructor
+     */
+    Parameter() { };
 
-    Option(const std::string& sf, const std::string& lf,
+    /**
+     * @brief Constructor with short form
+     */
+    Parameter(const std::string& sf, const std::string& lf,
             const ParamType t = OPTIONAL, const ParamArgs a = NO_ARGS,
             const std::string& desc = "",
             const std::string& def = "") {
@@ -54,10 +92,12 @@ struct Option {
         if(t == OPTIONAL && a == NO_ARGS && def == "") {
             this->def = "0";
         }
-
     }
 
-    Option(const std::string& lf, const ParamType t = OPTIONAL,
+    /**
+     * @brief Constructor without short form
+     */
+    Parameter(const std::string& lf, const ParamType t = OPTIONAL,
             const ParamArgs a = NO_ARGS, const std::string& desc = "",
             const std::string& def = "") {
         this->shortForm = "";
@@ -69,41 +109,123 @@ struct Option {
     }
 };
 
-class Parameters {
-    private:
-        std::map<std::string, std::string> values;
-        std::map<std::string, Option> options;
-        std::map<std::string, Option> soptions;
 
+/**
+ * @brief Parameter parser. This class gets all necessary informations and
+ * parses the parameters.
+ */
+class Parser {
+    private:
+        /**
+         * @brief The values, that have already been set
+         */
+        std::map<std::string, std::string> values;
+
+        /**
+         * @brief All parameters, accessible via the long form
+         */
+        std::map<std::string, Parameter> parameters;
+
+        /**
+         * @brief All parameters, accessible via the short form
+         */
+        std::map<std::string, Parameter> sparameters;
+
+        /**
+         * @brief All multiple values, accessible via long form
+         */
         std::map<std::string, std::vector<std::string>> multiple;
 
-        void addValue(const Option& o, const std::string& value);
+        /**
+         * @brief Adds a value to the passed parameter
+         */
+        void addValue(const Parameter& o, const std::string& value);
 
     public:
-        Parameters& operator<<(const Option& o);
+        /**
+         * @brief Adds the passed parameters
+         */
+        Parser& operator<<(const Parameter& o);
 
+        /**
+         * @brief Parses the parameters
+         */
         int parse(int argc, char** argv);
 
+        /**
+         * @brief Gets a single value. If multiple values are available, it return the last added value
+         *
+         * @param name parameters long form
+         *
+         * @return value
+         */
         std::string get(const std::string& name);
+
+        /**
+         * @brief Checks, if the passed flag has been set
+         *
+         * @param name parameters long form
+         */
         bool getFlag(const std::string& name);
+
+        /**
+         * @brief Returns the value as integer
+         *
+         * @param name parameters long form
+         *
+         * @return value as integer
+         */
         int getInt(const std::string& name);
+
+        /**
+         * @brief Gets all values as string
+         *
+         * @param name parameters long form
+         *
+         * @return values
+         */
         std::vector<std::string> getAll(const std::string& name);
 
+        /**
+         * @brief Prints usage table
+         */
         void printUsage(void);
 
+        /**
+         * @brief checks, if all required parameters are set. Throws an exception if this is not
+         * the case
+         */
         void checkRequired(void);
 };
 
+/**
+ * @brief A parameter exception, which is thrown by Parser.
+ */
 class ParameterException : public std::exception {
     private:
+        /**
+         * @brief the exception message
+         */
         std::string message;
+
+        /**
+         * @brief the long form of the parameter
+         */
         std::string parameter;
 
     public:
-        ParameterException(const std::string&, const std::string&);
+        /**
+         * @brief Default constructor
+         */
+        ParameterException(const std::string& message, const std::string& longForm);
 
         virtual ~ParameterException(void) throw();
 
+        /**
+         * @brief returns the exception message
+         *
+         * @return
+         */
         const char* what(void);
 
 };
