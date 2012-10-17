@@ -26,7 +26,7 @@
 namespace parampp {
 
 typedef enum {REQUIRED, OPTIONAL} ParamType;
-typedef enum {NO_ARGS, SINGLE_ARG} ParamArgs;
+typedef enum {NO_ARGS, SINGLE_ARG, MULTI_ARGS} ParamArgs;
 
 struct Option {
     std::string longForm;
@@ -50,6 +50,11 @@ struct Option {
         this->args = a;
         this->def = def;
         this->description = desc;
+
+        if(t == OPTIONAL && a == NO_ARGS && def == "") {
+            this->def = "0";
+        }
+
     }
 
     Option(const std::string& lf, const ParamType t = OPTIONAL,
@@ -70,6 +75,10 @@ class Parameters {
         std::map<std::string, Option> options;
         std::map<std::string, Option> soptions;
 
+        std::map<std::string, std::vector<std::string>> multiple;
+
+        void addValue(const Option& o, const std::string& value);
+
     public:
         Parameters& operator<<(const Option& o);
 
@@ -78,8 +87,11 @@ class Parameters {
         std::string get(const std::string& name);
         bool getFlag(const std::string& name);
         int getInt(const std::string& name);
+        std::vector<std::string> getAll(const std::string& name);
 
         void printUsage(void);
+
+        void checkRequired(void);
 };
 
 class ParameterException : public std::exception {

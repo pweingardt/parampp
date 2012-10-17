@@ -31,13 +31,6 @@ Parameters& Parameters::operator<<(const Option& o) {
              || o.shortForm == "")) {
         this->options[o.longForm] = o;
         this->soptions[o.shortForm] = o;
-        if(o.type == OPTIONAL && o.args == NO_ARGS) {
-                this->values[o.longForm] = "0";
-        }
-
-        if(o.def != "") {
-            this->values[o.longForm] = o.def;
-        }
     } else {
         throw ParameterException("Option already defined: ", o.longForm);
     }
@@ -48,7 +41,10 @@ Parameters& Parameters::operator<<(const Option& o) {
 void Parameters::printUsage(void) {
     unsigned int longest = 0;
 
-    std::cout << "Parameter format is either '-x value' or '--xy=value'" << std::endl;
+    std::cout << "Parameters: '-x value', '--xy=value', "
+        "'-x 1st_arg 2nd_arg ...', " << std::endl << "    '--xy=1st_arg --xy=2nd_arg', "
+        "or '-x 1st_arg (...) -x 2nd_arg'" << std::endl;
+    std::cout << "Flags: '-h' or '--help=(0|1)'." << std::endl;
 
     for(auto iter = this->options.begin(); iter != this->options.end(); ++iter) {
         const Option& o = iter->second;
@@ -102,22 +98,15 @@ int Parameters::parse(int argc, char** argv) {
                 }
 
                 const Option& op = this->options[pname];
+                std::string value;
 
-                if(op.args == NO_ARGS) {
-                    this->values[pname] = "1";
+                if(param.find("=") == std::string::npos) {
+                    value = "1";
                 } else {
-                    if(param.find("=") == std::string::npos) {
-                        throw ParameterException("Unknown parameter format "
-                                "(format should be --param=value): ", param);
-                    }
-
-                    std::string value(param.substr(param.find_first_of("=") + 1));
-                    if(value == "") {
-                        throw ParameterException("Unknown parameter format "
-                                "(format should be --param=value): ", param);
-                    }
-                    this->values[pname] = value;
+                    value = param.substr(param.find_first_of("=") + 1);
                 }
+
+                addValue(op, value);
                 parsed = true;
 
                 current = 0;
@@ -146,22 +135,65 @@ int Parameters::parse(int argc, char** argv) {
             if(current == 0) {
                 throw ParameterException("Argument parsing error: ", p);
             }
-            this->values[current->longForm] = p;
-            current = 0;
+
+            addValue(*current, p);
+
+            if(current->args != MULTI_ARGS) {
+                current = 0;
+            }
         }
     }
 
-    if(current != 0) {
+    if(current != 0 && current->args != MULTI_ARGS) {
         throw ParameterException("Parameter not specified: ", current->longForm);
     }
 
+    // add default values if necessary
+    for(auto iter = this->options.begin(); iter != this->options.end(); ++iter) {
+        if(iter->second.def != "") {
+            if(this->values.find(iter->first) == this->values.end()) {
+                addValue(iter->second, iter->second.def);
+            }
+        }
+    }
+
+    return 0;
+}
+
+void Parameters::checkRequired() {
+    // Check if all required parameters are available
     for(auto iter = this->options.begin(); iter != this->options.end(); ++iter) {
         if(iter->second.type == REQUIRED && this->values.find(iter->first) == this->values.end()) {
             throw ParameterException("Required parameter not specified: ", iter->first);
         }
     }
+}
 
-    return 0;
+void Parameters::addValue(const Option& o, const std::string& value) {
+    if(value == "") {
+        throw ParameterException("Parameter format exception: ", o.longForm);
+    }
+
+    switch(o.args) {
+        case NO_ARGS:
+            if(value != "1" && value != "0") {
+                throw ParameterException("Parameter flags are either '0' or '1': ", o.longForm);
+            }
+            this->values[o.longForm] = value;
+            break;
+
+        case SINGLE_ARG:
+            if(this->values.find(o.longForm) != this->values.end()) {
+                throw ParameterException("Parameter already defined: ", o.longForm);
+            }
+            this->values[o.longForm] = value;
+            break;
+
+        case MULTI_ARGS:
+            this->multiple[o.longForm].push_back(value);
+            this->values[o.longForm] = value;
+            break;
+    }
 }
 
 std::string Parameters::get(const std::string& name) {
@@ -176,6 +208,10 @@ bool Parameters::getFlag(const std::string& name) {
 int Parameters::getInt(const std::string& name) {
     int v = atoi(this->values[name].c_str());
     return v;
+}
+
+std::vector<std::string> Parameters::getAll(const std::string& name) {
+    return this->multiple[name];
 }
 
 ParameterException::ParameterException(const std::string& message,
