@@ -51,6 +51,17 @@ struct Option {
         this->def = def;
         this->description = desc;
     }
+
+    Option(const std::string& lf, const ParamType t = OPTIONAL,
+            const ParamArgs a = NO_ARGS, const std::string& desc = "",
+            const std::string& def = "") {
+        this->shortForm = "";
+        this->longForm = lf;
+        this->type = t;
+        this->args = a;
+        this->def = def;
+        this->description = desc;
+    }
 };
 
 class Parameters {

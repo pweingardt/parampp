@@ -64,16 +64,17 @@ void Parameters::printUsage(void) {
         if(o.shortForm != "") {
             std::cout << "-" << o.shortForm << ", ";
         } else {
-            std::cout << "   ";
+            std::cout << "    ";
         }
 
         std::cout << "--" << o.longForm;
-        for(unsigned int i = 0; i < longest - o.shortForm.length() - o.longForm.length() + width; ++i) {
+        int shortLength = (o.shortForm == "" ? 1 : o.shortForm.length());
+        for(unsigned int i = 0; i < longest - shortLength - o.longForm.length() + width; ++i) {
             std::cout << " ";
         }
         std::cout << o.description;
         if(o.type == REQUIRED) {
-            std::cout << "   (required)";
+            std::cout << " (required)";
         }
         std::cout << std::endl;
     }
