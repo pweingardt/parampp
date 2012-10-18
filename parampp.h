@@ -189,13 +189,13 @@ class Parser {
         /**
          * @brief Prints usage table
          */
-        void printUsage(void);
+        void printUsage(const bool format = false);
 
         /**
          * @brief checks, if all required parameters are set. Throws an exception if this is not
          * the case
          */
-        void checkRequired(void);
+        void checkRequired();
 };
 
 /**
@@ -214,14 +214,14 @@ class ParserException : public std::exception {
          */
         ParserException(const std::string& message, const std::string& longForm);
 
-        virtual ~ParserException(void) throw();
+        virtual ~ParserException() throw();
 
         /**
          * @brief returns the exception message
          *
          * @return
          */
-        const char* what(void);
+        const char* what();
 
 };
 

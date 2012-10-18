@@ -44,13 +44,17 @@ Parser& Parser::operator<<(const Parameter& o) {
     return *this;
 }
 
-void Parser::printUsage(void) {
+void Parser::printUsage(const bool format) {
     unsigned int longest = 0;
 
-    std::cout << "Parser: '-x value', '--xy=value', "
-        "'-x 1st_arg 2nd_arg ...', " << std::endl << "    '--xy=1st_arg --xy=2nd_arg', "
-        "or '-x 1st_arg (...) -x 2nd_arg'" << std::endl;
-    std::cout << "Flags: '-h' or '--help=(0|1)'." << std::endl;
+    if(format) {
+        std::cout << "Parameters: " << std::endl;
+        std::cout << "    '-x value', '--xy=value', " << std::endl;
+        std::cout << "    '-x 1st_arg 2nd_arg ...', " << std::endl;
+        std::cout << "    '--xy=1st_arg --xy=2nd_arg', " << std::endl;
+        std::cout << "    '-x 1st_arg (...) -x 2nd_arg'" << std::endl;
+        std::cout << "Flags: '-h' or '--help=(0|1)'." << std::endl;
+    }
 
     for(auto iter = this->parameters.begin(); iter != this->parameters.end(); ++iter) {
         const Parameter& o = iter->second;
@@ -77,6 +81,9 @@ void Parser::printUsage(void) {
         std::cout << o.description;
         if(o.type == REQUIRED) {
             std::cout << " (required)";
+        }
+        if(o.def != "" && o.args != NO_ARGS) {
+            std::cout << ", default: " << o.def;
         }
         std::cout << std::endl;
     }
@@ -225,10 +232,10 @@ ParserException::ParserException(const std::string& message,
     this->message = std::string(message + parameter);
 }
 
-ParserException::~ParserException(void) throw() {
+ParserException::~ParserException() throw() {
 }
 
-const char* ParserException::what(void) {
+const char* ParserException::what() {
     return this->message.c_str();
 }
 
