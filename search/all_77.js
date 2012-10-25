@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['what',['what',['../classparampp_1_1_parameter_exception.html#aa56f76c19b1f57d038ff0fd295cffa7c',1,'parampp::ParameterException']]]
+  ['what',['what',['../classparampp_1_1_parser_exception.html#ac734e942c3a075e37e73128fffc468eb',1,'parampp::ParserException']]]
 ];

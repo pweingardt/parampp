@@ -115,22 +115,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            &lt;&lt; <a class="code" href="structparampp_1_1_parameter.html" title="A single parameter.">parampp::Parameter</a>(<span class="stringliteral">&quot;o&quot;</span>, <span class="stringliteral">&quot;out&quot;</span>, parampp::REQUIRED, parampp::SINGLE_ARG, <span class="stringliteral">&quot;the output file&quot;</span>);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#ac58e2d7e60397dd8c675fd30945d7543" title="Parses the parameters.">parse</a>(argc, argv);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    } <span class="keywordflow">catch</span>(<a class="code" href="classparampp_1_1_parameter_exception.html" title="A parameter exception, which is thrown by Parser.">parampp::ParameterException</a> e) {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        std::cout &lt;&lt; e.<a class="code" href="classparampp_1_1_parameter_exception.html#aa56f76c19b1f57d038ff0fd295cffa7c" title="returns the exception message">what</a>() &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#a4c55035117351b0dfe42582696304296" title="Prints usage table.">printUsage</a>();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    } <span class="keywordflow">catch</span>(<a class="code" href="classparampp_1_1_parser_exception.html" title="A parameter exception, which is thrown by Parser.">parampp::ParserException</a> e) {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        std::cout &lt;&lt; e.<a class="code" href="classparampp_1_1_parser_exception.html#ac734e942c3a075e37e73128fffc468eb" title="returns the exception message">what</a>() &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#ad9a345221257be12179a749c8cf7b2f5" title="Prints usage table.">printUsage</a>();</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    }</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">if</span>(p.<a class="code" href="classparampp_1_1_parser.html#a15d1e9adcdd3b9e8c3dd7e3e79713073" title="Checks, if the passed flag has been set.">getFlag</a>(<span class="stringliteral">&quot;help&quot;</span>)) {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#a4c55035117351b0dfe42582696304296" title="Prints usage table.">printUsage</a>();</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#ad9a345221257be12179a749c8cf7b2f5" title="Prints usage table.">printUsage</a>();</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    }</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordflow">try</span> {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#aab70bdc450f3100891deba20aabf3ec9" title="checks, if all required parameters are set. Throws an exception if this is not the case...">checkRequired</a>();</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    } <span class="keywordflow">catch</span>(<a class="code" href="classparampp_1_1_parameter_exception.html" title="A parameter exception, which is thrown by Parser.">parampp::ParameterException</a> e) {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        std::cout &lt;&lt; e.<a class="code" href="classparampp_1_1_parameter_exception.html#aa56f76c19b1f57d038ff0fd295cffa7c" title="returns the exception message">what</a>() &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#a4c55035117351b0dfe42582696304296" title="Prints usage table.">printUsage</a>();</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#a1373ca54d74c537467a12f60a0f5dc28" title="checks, if all required parameters are set. Throws an exception if this is not the case...">checkRequired</a>();</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    } <span class="keywordflow">catch</span>(<a class="code" href="classparampp_1_1_parser_exception.html" title="A parameter exception, which is thrown by Parser.">parampp::ParserException</a> e) {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        std::cout &lt;&lt; e.<a class="code" href="classparampp_1_1_parser_exception.html#ac734e942c3a075e37e73128fffc468eb" title="returns the exception message">what</a>() &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        p.<a class="code" href="classparampp_1_1_parser.html#ad9a345221257be12179a749c8cf7b2f5" title="Prints usage table.">printUsage</a>();</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
@@ -146,7 +146,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 17 2012 18:03:42 for Parampp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Oct 25 2012 15:19:52 for Parampp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>
