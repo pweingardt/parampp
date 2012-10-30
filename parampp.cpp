@@ -28,8 +28,12 @@
 namespace parampp {
 
 Parser& Parser::operator<<(const Parameter& o) {
+    /*
     if(o.longForm == "") {
         throw ParserException("Empty long form parameter not allowed: ", o.shortForm);
+    }*/
+    if(o.longForm == "" && o.args == NO_ARGS) {
+        throw ParserException("You can not define a standard parameter as flag.", o.longForm);
     }
 
     if(this->parameters.find(o.longForm) == this->parameters.end() &&
@@ -63,6 +67,12 @@ void Parser::printUsage(const bool format) {
         }
     }
 
+    std::cout << "Execute: " << this->exec << " (options)";
+    if(this->parameters.find("") != this->parameters.end()) {
+        std::cout << " [ARGS]";
+    }
+    std::cout << std::endl;
+
     for(auto iter = this->parameters.begin(); iter != this->parameters.end(); ++iter) {
         unsigned int width = 8;
 
@@ -70,10 +80,17 @@ void Parser::printUsage(const bool format) {
         if(o.shortForm != "") {
             std::cout << "-" << o.shortForm << ", ";
         } else {
-            std::cout << "    ";
+            if(o.longForm != "") {
+                std::cout << "    ";
+            }
         }
 
-        std::cout << "--" << o.longForm;
+        if(o.longForm != "") {
+            std::cout << "--" << o.longForm;
+        } else {
+            std::cout << "[ARGS]";
+        }
+
         int shortLength = (o.shortForm == "" ? 1 : o.shortForm.length());
         for(unsigned int i = 0; i < longest - shortLength - o.longForm.length() + width; ++i) {
             std::cout << " ";
@@ -82,6 +99,11 @@ void Parser::printUsage(const bool format) {
         if(o.type == REQUIRED) {
             std::cout << " (required)";
         }
+
+        if(o.type == OPTIONAL) {
+            std::cout << " (optional)";
+        }
+
         if(o.def != "" && o.args != NO_ARGS) {
             std::cout << ", default: " << o.def;
         }
@@ -91,6 +113,7 @@ void Parser::printUsage(const bool format) {
 
 int Parser::parse(int argc, char** argv) {
     Parameter* current = 0;
+    this->exec = argv[0];
     for(int i = 1; i < argc; ++i) {
         std::string p(argv[i]);
         bool parsed = false;
@@ -145,8 +168,13 @@ int Parser::parse(int argc, char** argv) {
         }
 
         if(parsed == false) {
-            if(current == 0) {
+            if(current == 0 && this->parameters.find("") == this->parameters.end()) {
                 throw ParserException("Argument parsing error: ", p);
+            }
+
+            // At this point, there should be an standard parameter
+            if(current == 0) {
+                current = &this->parameters[""];
             }
 
             addValue(*current, p);
@@ -210,6 +238,10 @@ void Parser::addValue(const Parameter& o, const std::string& value) {
 }
 
 std::string Parser::get(const std::string& name) {
+    return this->values[name];
+}
+
+std::string Parser::operator[](const std::string& name) {
     return this->values[name];
 }
 

@@ -36,7 +36,9 @@ int main(int argc, char** argv) {
             << parampp::Parameter("f", "file", parampp::REQUIRED, parampp::MULTI_ARGS, "the input files",
                     "default.conf")
 
-            << parampp::Parameter("o", "out", parampp::REQUIRED, parampp::SINGLE_ARG, "the output file");
+            << parampp::Parameter("o", "out", parampp::REQUIRED, parampp::SINGLE_ARG, "the output file")
+
+            << parampp::Parameter(parampp::OPTIONAL, parampp::MULTI_ARGS, "config files");
         p.parse(argc, argv);
     } catch(parampp::ParserException e) {
         std::cout << e.what() << std::endl;
@@ -57,8 +59,14 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    std::cout << "Outputfile: " << p.get("out") << std::endl;
-    std::cout << "Inputfiles: " << std::endl;
+    std::cout << "Output file: " << p["out"] << std::endl;
+    std::cout << "Config files: " << std::endl;
+    std::vector<std::string> all = p.getAll("");
+    for(auto i = all.begin(); i != all.end(); ++i) {
+        std::cout << "   " << *i << std::endl;
+    }
+
+    std::cout << "Input files: " << std::endl;
     std::vector<std::string> values = p.getAll("file");
     for(auto i = values.begin(); i != values.end(); ++i) {
         std::cout << "   " << *i << std::endl;

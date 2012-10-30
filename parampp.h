@@ -15,8 +15,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#ifndef PARAMPP_H
+#define PARAMPP_H
 
 #include <vector>
 #include <map>
@@ -107,6 +107,17 @@ struct Parameter {
         this->def = def;
         this->description = desc;
     }
+
+    Parameter(const ParamType t, const ParamArgs a = SINGLE_ARG,
+            const std::string& desc = "",
+            const std::string& def = "") {
+        this->shortForm = "";
+        this->longForm = "";
+        this->type = t;
+        this->args = a;
+        this->def = def;
+        this->description = desc;
+    }
 };
 
 
@@ -116,6 +127,11 @@ struct Parameter {
  */
 class Parser {
     private:
+        /**
+         * @brief The executable path (argv[0])
+         */
+        std::string exec;
+
         /**
          * @brief The values, that have already been set
          */
@@ -153,13 +169,24 @@ class Parser {
         int parse(int argc, char** argv);
 
         /**
-         * @brief Gets a single value. If multiple values are available, it return the last added value
+         * @brief Gets a single value. If multiple values are available, it
+         * returns the last added value.
          *
          * @param name parameters long form
          *
          * @return value
          */
         std::string get(const std::string& name);
+
+        /**
+         * @brief Gets a single value. If multiple values are available, if
+         * returns the last added value.
+         *
+         * @param name parameters long form
+         *
+         * @return
+         */
+        std::string operator [] (const std::string& name);
 
         /**
          * @brief Checks, if the passed flag has been set
@@ -192,7 +219,8 @@ class Parser {
         void printUsage(const bool format = false);
 
         /**
-         * @brief checks, if all required parameters are set. Throws an exception if this is not
+         * @brief checks, if all required parameters are set.
+         * Throws an exception if this is not
          * the case
          */
         void checkRequired();
@@ -212,7 +240,8 @@ class ParserException : public std::exception {
         /**
          * @brief Default constructor
          */
-        ParserException(const std::string& message, const std::string& longForm);
+        ParserException(const std::string& message,
+                const std::string& longForm);
 
         virtual ~ParserException() throw();
 
