@@ -108,6 +108,10 @@ struct Parameter {
         this->description = desc;
     }
 
+    /**
+     * @brief Constructor for default parameter, has no
+     * short and no long form
+     */
     Parameter(const ParamType t, const ParamArgs a = SINGLE_ARG,
             const std::string& desc = "",
             const std::string& def = "") {
